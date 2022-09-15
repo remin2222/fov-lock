@@ -6,7 +6,7 @@ local Workspace = game:GetService("Workspace")
 local GuiService = game:GetService("GuiService")
 local RunService = game:GetService("RunService")
 
--- // Sinful
+-- // Vars
 local Heartbeat = RunService.Heartbeat
 local LocalPlayer = Players.LocalPlayer
 local CurrentCamera = Workspace.CurrentCamera
@@ -33,12 +33,12 @@ local FindFirstChild = Instancenew("Part").FindFirstChild
 local tableremove = table.remove
 local tableinsert = table.insert
 
-
+-- // Silent Aim Vars
 getgenv().Aiming = {
     Enabled = true,
 
-    ShowFOV = true,
-    FOV = 40,
+    ShowFOV = false,
+    FOV = 80,
     FOVSides = 12,
     FOVColour = Color3fromRGB(231, 84, 128),
 
@@ -106,14 +106,14 @@ end
 
 -- // Customisable Checking Functions: Is a part visible
 function Aiming.IsPartVisible(Part, PartDescendant)
-    -- // Sinful
+    -- // Vars
     local Character = LocalPlayer.Character or CharacterAddedWait(CharacterAdded)
     local Origin = CurrentCamera.CFrame.Position
     local _, OnScreen = WorldToViewportPoint(CurrentCamera, Part.Position)
 
     -- //
     if (OnScreen) then
-        -- // Sinful
+        -- // Vars
         local raycastParams = RaycastParamsnew()
         raycastParams.FilterType = EnumRaycastFilterTypeBlacklist
         raycastParams.FilterDescendantsInstances = {Character, CurrentCamera}
@@ -138,7 +138,7 @@ end
 
 -- // Ignore player
 function Aiming.IgnorePlayer(Player)
-    -- // Sinful
+    -- // Vars
     local Ignored = Aiming.Ignored
     local IgnoredPlayers = Ignored.Players
 
@@ -157,7 +157,7 @@ end
 
 -- // Unignore Player
 function Aiming.UnIgnorePlayer(Player)
-    -- // Sinful
+    -- // Vars
     local Ignored = Aiming.Ignored
     local IgnoredPlayers = Ignored.Players
 
@@ -315,7 +315,7 @@ Aiming.checkSilentAim = Aiming.Check
 function Aiming.GetClosestTargetPartToCursor(Character)
     local TargetParts = Aiming.TargetPart
 
-    -- // Sinful
+    -- // Vars
     local ClosestPart = nil
     local ClosestPartPosition = nil
     local ClosestPartOnScreen = false
@@ -383,7 +383,7 @@ end
 
 -- // Silent Aim Function
 function Aiming.GetClosestPlayerToCursor()
-    -- // Sinful
+    -- // Vars
     local TargetPart = nil
     local ClosestPlayer = nil
     local Chance = CalcChance(Aiming.HitChance)
@@ -414,7 +414,7 @@ function Aiming.GetClosestPlayerToCursor()
                     -- // Check if Visible
                     if (Aiming.VisibleCheck and not Aiming.IsPartVisible(TargetPartTemp, Character)) then continue end
 
-                    -- // Set sinful
+                    -- // Set vars
                     ClosestPlayer = Player
                     ShortestDistance = Magnitude
                     TargetPart = TargetPartTemp
@@ -424,3 +424,17 @@ function Aiming.GetClosestPlayerToCursor()
     end
 
     -- // End
+    Aiming.Selected = ClosestPlayer
+    Aiming.SelectedPart = TargetPart
+end
+
+-- // Heartbeat Function
+Heartbeat:Connect(function()
+    Aiming.UpdateFOV()
+    Aiming.GetClosestPlayerToCursor()
+end)
+
+-- //
+return Aiming
+
+-- // If you want the examples, look at the docs.
